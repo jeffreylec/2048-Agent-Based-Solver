@@ -156,34 +156,40 @@ Agent.prototype.selectMove = function (gameManager) {
 Agent.prototype.evaluateGrid = function (gameManager) {
     // calculate a score for the current grid configuration
     var brain = new AgentBrain(gameManager);
-    var aggregateScores = [0,0,0,0];
-    for (var z = 0; z < 50; z++) {
+    var aggregateScores = [0, 0, 0, 0];
+    for (var z = 0; z < 100; z++) {
         var bestMove = 0, score = 0;
         for (var i = 0; i < 4; i++) {
             var moved = brain.move(i);
+            brain.move(randomInt(3));
+            brain.move(randomInt(3));
             if (score <= brain.score && moved) {
                 bestMove = i;
-                brain.move(randomInt(3));
-                brain.move(randomInt(3));
                 score = brain.score;
                 aggregateScores[bestMove] += score;
             }
             brain.reset();
         }
 
-}
-    var theMax = Math.max(aggregateScores[0], aggregateScores[1], aggregateScores[2], aggregateScores[3]);
-    var theMove;
-    for (var j = 0; j < 4; j++) {
-        if(theMax === aggregateScores[j])
-        theMove = j;
     }
-    if(brain.move(theMove)) {
-        //alert(theMove);
+    var theMax = Math.max(aggregateScores[0], aggregateScores[1], aggregateScores[2], aggregateScores[3]);
+    var nextBestMove = [aggregateScores[0], aggregateScores[1], aggregateScores[2], aggregateScores[3]];
+
+    // sorts the aggregated scores in best order, instead of moving randomly
+    // if the best move cannot be a legit move.
+    nextBestMove.sort();
+
+    // gets move by finding the index
+    var theMove = aggregateScores.indexOf(theMax);
+
+    if (brain.move(theMove)) {
         return theMove;
-    }    else {
-        //alert("1");
-        return 1;
+    } else if (brain.move(aggregateScores.indexOf(nextBestMove[1]))) {
+        return aggregateScores.indexOf(nextBestMove[1]);
+    } else if (brain.move(aggregateScores.indexOf(nextBestMove[2]))) {
+        return aggregateScores.indexOf(nextBestMove[2]);
+    } else {
+        return aggregateScores.indexOf(nextBestMove[3]);
     }
 
 };
