@@ -49,7 +49,7 @@ AgentBrain.prototype.move = function (direction) {
     // Traverse the grid in the right direction and move tiles
     traversals.x.forEach(function (x) {
         traversals.y.forEach(function (y) {
-            cell = { x: x, y: y };
+            cell = {x: x, y: y};
             tile = self.grid.cellContent(cell);
 
             if (tile) {
@@ -91,10 +91,10 @@ AgentBrain.prototype.move = function (direction) {
 AgentBrain.prototype.getVector = function (direction) {
     // Vectors representing tile movement
     var map = {
-        0: { x: 0, y: -1 }, // Up
-        1: { x: 1, y: 0 },  // Right
-        2: { x: 0, y: 1 },  // Down
-        3: { x: -1, y: 0 }   // Left
+        0: {x: 0, y: -1}, // Up
+        1: {x: 1, y: 0},  // Right
+        2: {x: 0, y: 1},  // Down
+        3: {x: -1, y: 0}   // Left
     };
 
     return map[direction];
@@ -102,7 +102,7 @@ AgentBrain.prototype.getVector = function (direction) {
 
 // Build a list of positions to traverse in the right order
 AgentBrain.prototype.buildTraversals = function (vector) {
-    var traversals = { x: [], y: [] };
+    var traversals = {x: [], y: []};
 
     for (var pos = 0; pos < this.size; pos++) {
         traversals.x.push(pos);
@@ -122,9 +122,9 @@ AgentBrain.prototype.findFarthestPosition = function (cell, vector) {
     // Progress towards the vector direction until an obstacle is found
     do {
         previous = cell;
-        cell = { x: previous.x + vector.x, y: previous.y + vector.y };
+        cell = {x: previous.x + vector.x, y: previous.y + vector.y};
     } while (this.grid.withinBounds(cell) &&
-             this.grid.cellAvailable(cell));
+    this.grid.cellAvailable(cell));
 
     return {
         farthest: previous,
@@ -146,14 +146,44 @@ Agent.prototype.selectMove = function (gameManager) {
     // brain.move(i) 
     // i = 0: up, 1: right, 2: down, 3: left
     // brain.reset() resets the brain to the current game board
-
-    if (brain.move(0)) return 0;
-    if (brain.move(1)) return 1;
-    if (brain.move(3)) return 3;
-    if (brain.move(2)) return 2;
+    //if (brain.move(2)) return 2;
+    //if (brain.move(3)) return 3;
+    //if (brain.move(1)) return 1;
+    //if (brain.move(0)) return 0;
+    return this.evaluateGrid(gameManager);
 };
 
 Agent.prototype.evaluateGrid = function (gameManager) {
     // calculate a score for the current grid configuration
+    var brain = new AgentBrain(gameManager);
+    var aggregateScores = [0,0,0,0];
+    for (var z = 0; z < 50; z++) {
+        var bestMove = 0, score = 0;
+        for (var i = 0; i < 4; i++) {
+            var moved = brain.move(i);
+            if (score <= brain.score && moved) {
+                bestMove = i;
+                brain.move(randomInt(3));
+                brain.move(randomInt(3));
+                score = brain.score;
+                aggregateScores[bestMove] += score;
+            }
+            brain.reset();
+        }
+
+}
+    var theMax = Math.max(aggregateScores[0], aggregateScores[1], aggregateScores[2], aggregateScores[3]);
+    var theMove;
+    for (var j = 0; j < 4; j++) {
+        if(theMax === aggregateScores[j])
+        theMove = j;
+    }
+    if(brain.move(theMove)) {
+        //alert(theMove);
+        return theMove;
+    }    else {
+        //alert("1");
+        return 1;
+    }
 
 };
