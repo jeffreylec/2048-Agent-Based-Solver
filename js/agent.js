@@ -156,8 +156,9 @@ Agent.prototype.selectMove = function (gameManager) {
 Agent.prototype.evaluateGrid = function (gameManager) {
     // calculate a score for the current grid configuration
     var brain = new AgentBrain(gameManager);
+    var size = 200;
     var aggregateScores = [0, 0, 0, 0];
-    for (var z = 0; z < 100; z++) {
+    for (var z = 0; z < size; z++) {
         var bestMove = 0, score = 0;
         for (var i = 0; i < 4; i++) {
             var moved = brain.move(i);
