@@ -143,43 +143,30 @@ Agent.prototype.selectMove = function (gameManager) {
     var brain = new AgentBrain(gameManager);
     brain.reset();
     // Use the brain to simulate moves
-    // brain.move(i) 
     // i = 0: up, 1: right, 2: down, 3: left
-    // brain.reset() resets the brain to the current game board
-    //if (brain.move(2)) return 2;
-    //if (brain.move(3)) return 3;
-    //if (brain.move(1)) return 1;
-    //if (brain.move(0)) return 0;
     var theMove = this.evaluateGrid(gameManager);
-    //alert(brain.grid.cellAvailable());
     if (brain.move(theMove)) {
         return theMove
     } else {
         return randomInt(4);
     }
-    //return this.evaluateGrid(gameManager);
 };
-
-Agent.prototype.canMove = function(gameManager){
-    var brain = new AgentBrain(gameManager);
-    return (brain.move(0) || brain.move(1) || brain.move(2) || brain.move(3));
-}
 
 Agent.prototype.evalHelper = function (i, gameManager) {
     var brain = new AgentBrain(gameManager);
     brain.reset();
     var score = 0;
-    var z = 100
-    while (z--) {
+    var runs = 50;
+    while (runs--) {
         if (!brain.move(i)) return 0;
-        brain.move(randomInt(3));
-        brain.move(randomInt(3));
-        score += brain.score;
+        for(var moves = 0; moves < 10; moves++){
+            brain.move(randomInt(3));
+            score += brain.score;
+        }
         brain.reset();
     }
-
     return score;
-}
+};
 
 
 Agent.prototype.evaluateGrid = function (gameManager) {
