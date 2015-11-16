@@ -141,7 +141,7 @@ function Agent() {
 
 Agent.prototype.selectMove = function (gameManager) {
     var brain = new AgentBrain(gameManager);
-
+    brain.reset();
     // Use the brain to simulate moves
     // brain.move(i) 
     // i = 0: up, 1: right, 2: down, 3: left
@@ -150,28 +150,44 @@ Agent.prototype.selectMove = function (gameManager) {
     //if (brain.move(3)) return 3;
     //if (brain.move(1)) return 1;
     //if (brain.move(0)) return 0;
-    return this.evaluateGrid(gameManager);
+    var theMove = this.evaluateGrid(gameManager);
+    //alert(brain.grid.cellAvailable());
+    if (brain.move(theMove)) {
+        return theMove
+    } else {
+        return randomInt(4);
+    }
+    //return this.evaluateGrid(gameManager);
 };
 
-Agent.prototype.evaluateGrid = function (gameManager) {
-    // calculate a score for the current grid configuration
+Agent.prototype.canMove = function(gameManager){
     var brain = new AgentBrain(gameManager);
-    var size = 200;
-    var aggregateScores = [0, 0, 0, 0];
-    for (var z = 0; z < size; z++) {
-        var bestMove = 0, score = 0;
-        for (var i = 0; i < 4; i++) {
-            var moved = brain.move(i);
-            brain.move(randomInt(3));
-            brain.move(randomInt(3));
-            if (score <= brain.score && moved) {
-                bestMove = i;
-                score = brain.score;
-                aggregateScores[bestMove] += score;
-            }
-            brain.reset();
-        }
+    return (brain.move(0) || brain.move(1) || brain.move(2) || brain.move(3));
+}
 
+Agent.prototype.evalHelper = function (i, gameManager) {
+    var brain = new AgentBrain(gameManager);
+    brain.reset();
+    var score = 0;
+    var z = 100
+    while (z--) {
+        if (!brain.move(i)) return 0;
+        brain.move(randomInt(3));
+        brain.move(randomInt(3));
+        score += brain.score;
+        brain.reset();
+    }
+
+    return score;
+}
+
+
+Agent.prototype.evaluateGrid = function (gameManager) {
+    // calculate a score for he current grid configuration
+    var brain = new AgentBrain(gameManager);
+    var aggregateScores = [0, 0, 0, 0];
+    for (var i = 0; i < 4; i++) {
+        aggregateScores[i] = this.evalHelper(i, gameManager);
     }
     var theMax = Math.max(aggregateScores[0], aggregateScores[1], aggregateScores[2], aggregateScores[3]);
     var nextBestMove = [aggregateScores[0], aggregateScores[1], aggregateScores[2], aggregateScores[3]];
@@ -192,5 +208,4 @@ Agent.prototype.evaluateGrid = function (gameManager) {
     } else {
         return aggregateScores.indexOf(nextBestMove[3]);
     }
-
 };
