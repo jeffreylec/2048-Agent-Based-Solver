@@ -144,21 +144,17 @@ Agent.prototype.selectMove = function (gameManager) {
     brain.reset();
     // Use the brain to simulate moves
     // i = 0: up, 1: right, 2: down, 3: left
-    var theMove = this.evaluateGrid(gameManager);
-    if (brain.move(theMove)) {
-        return theMove
-    } else {
-        return randomInt(4);
-    }
+    return this.evaluateGrid(gameManager);
 };
 
 Agent.prototype.evalHelper = function (i, gameManager) {
     var brain = new AgentBrain(gameManager);
-    brain.reset();
+    //brain.reset();
     var score = 0;
-    var runs = 50;
+    var runs = 150;
     while (runs--) {
         if (!brain.move(i)) return 0;
+        score += brain.score;
         for(var moves = 0; moves < 10; moves++){
             brain.move(randomInt(3));
             score += brain.score;
