@@ -151,14 +151,15 @@ Agent.prototype.evalHelper = function (i, gameManager) {
     var brain = new AgentBrain(gameManager);
     //brain.reset();
     var score = 0;
-    var runs = 150;
+    var runs = 50;
     while (runs--) {
         if (!brain.move(i)) return 0;
-        score += brain.score;
-        for(var moves = 0; moves < 10; moves++){
+        //score += brain.score;
+        for (var moves = 0; moves < 20; moves++) {
             brain.move(randomInt(3));
-            score += brain.score;
+            //score += brain.score;
         }
+        score += brain.score;
         brain.reset();
     }
     return score;
