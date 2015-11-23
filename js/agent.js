@@ -156,7 +156,7 @@ Agent.prototype.evalHelper = function (i, gameManager) {
         if (!brain.move(i)) return 0;
         //score += brain.score;
         for (var moves = 0; moves < 20; moves++) {
-            brain.move(randomInt(3));
+            brain.move(randomInt(4));
             //score += brain.score;
         }
         score += brain.score;
