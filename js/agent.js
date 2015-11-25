@@ -1,14 +1,30 @@
+/*
+* name: Robbie Nichols, Jeffrey LeCompte
+* assignment: Assignment 2 - 2048 Agent
+* class: TCSS 435 AI - Dr. Chriss Marriot
+* operation: Creating an AI that can play the game well enough
+* to reliably win. If the AI is winning then I will try to optimize
+* it to get as high a score as possible.
+*
+* It must select its move within one sixtieth of a second
+* (that is, it must make 60 moves a second or more). Since the
+* game is random we will test the agent a number of times to
+* collect a set of scores. All agents capable of winning the
+* game will be submitted to a friendly in­class competition
+* for highest score.
+*/
+
 // helper functions
 function randomInt(n) {
     return Math.floor(Math.random() * n);
-};
+}
 
 function AgentBrain(gameEngine) {
     this.size = 4;
     this.previousState = gameEngine.grid.serialize();
     this.reset();
     this.score = 0;
-};
+}
 
 AgentBrain.prototype.reset = function () {
     this.score = 0;
@@ -139,17 +155,25 @@ AgentBrain.prototype.positionsEqual = function (first, second) {
 function Agent() {
 };
 
+/*
+* This method will do most of it's work with the help of the
+* evalHelper and the evaluateGrid function
+*/
 Agent.prototype.selectMove = function (gameManager) {
     var brain = new AgentBrain(gameManager);
     brain.reset();
-    // Use the brain to simulate moves
     // i = 0: up, 1: right, 2: down, 3: left
     return this.evaluateGrid(gameManager);
 };
 
+/*
+* evalHelper simulates 50 games with a given direction with
+* 20 random moves after that. It will send the total score
+* of the given direction to the evaluateGrid function to later
+* determine if the move is optimal.
+*/
 Agent.prototype.evalHelper = function (i, gameManager) {
     var brain = new AgentBrain(gameManager);
-    //brain.reset();
     var score = 0;
     var runs = 50;
     while (runs--) {
@@ -164,31 +188,48 @@ Agent.prototype.evalHelper = function (i, gameManager) {
     return score;
 };
 
-
+/*
+* evaluateGrid uses the work done by evalHelper by sorting
+* all the aggregated scores from the random moves done by each
+* given direction. It will determine if a move is optimal
+* as well as valid.
+*/
 Agent.prototype.evaluateGrid = function (gameManager) {
-    // calculate a score for he current grid configuration
+    // Calculate a score for the current grid configuration.
     var brain = new AgentBrain(gameManager);
     var aggregateScores = [0, 0, 0, 0];
     for (var i = 0; i < 4; i++) {
         aggregateScores[i] = this.evalHelper(i, gameManager);
     }
+
+    // Based on the aggregated scores from each direction (including random moves)
+    // the next move will be determined by the max score of each direction.
     var theMax = Math.max(aggregateScores[0], aggregateScores[1], aggregateScores[2], aggregateScores[3]);
+
+    // nextBestMove puts all the aggregated scores in another array for
+    // further sorting. The purpose of theMax (or following) moves are not valid moves.
     var nextBestMove = [aggregateScores[0], aggregateScores[1], aggregateScores[2], aggregateScores[3]];
 
-    // sorts the aggregated scores in best order, instead of moving randomly
+    // Sorts the aggregated scores in best order, instead of moving randomly
     // if the best move cannot be a legit move.
     nextBestMove.sort();
 
-    // gets move by finding the index
+    // Gets move by finding the correct index corresponding to the
+    // direction of the aggregated score.
     var theMove = aggregateScores.indexOf(theMax);
 
+    // This if/else series determines what moves are valid.
     if (brain.move(theMove)) {
+        // most optimal move (theMax)
         return theMove;
     } else if (brain.move(aggregateScores.indexOf(nextBestMove[1]))) {
+        // second best move
         return aggregateScores.indexOf(nextBestMove[1]);
     } else if (brain.move(aggregateScores.indexOf(nextBestMove[2]))) {
+        // third best move
         return aggregateScores.indexOf(nextBestMove[2]);
     } else {
+        // all else fails, use least favorable move
         return aggregateScores.indexOf(nextBestMove[3]);
     }
 };
