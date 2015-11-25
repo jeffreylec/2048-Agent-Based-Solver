@@ -175,7 +175,7 @@ Agent.prototype.selectMove = function (gameManager) {
 Agent.prototype.evalHelper = function (i, gameManager) {
     var brain = new AgentBrain(gameManager);
     var score = 0;
-    var runs = 75;
+    var runs = 100;
     while (runs--) {
         // If our given move works, we will add it to the score.
         if (!brain.move(i)) return 0;
