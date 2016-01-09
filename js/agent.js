@@ -175,18 +175,19 @@ Agent.prototype.selectMove = function (gameManager) {
 Agent.prototype.evalHelper = function (i, gameManager) {
     var brain = new AgentBrain(gameManager);
     var score = 0;
-    var runs = 100;
+    var runs = 50;
     while (runs--) {
         // If our given move works, we will add it to the score.
         if (!brain.move(i)) return 0;
         score += brain.score;
 
         // Makes 20 random moves, adding to the brain.score.
-        for (var moves = 0; moves < 20; moves++)
+        for (var moves = 0; moves < 20; moves++) {
             brain.move(randomInt(4));
+            score += brain.score;
+        }
 
         // Adds the random scores to the over all score.
-        score += brain.score;
         brain.reset();
     }
     return score;
